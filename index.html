@@ -2,16 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Scatter Plot Activity</title>
+    <title>Scatterplot Visualization</title>
     <style>
         body {
             font-family: sans-serif;
         }
+
         svg {
             width: 40vw;
             height: 40vw;
         }
 
+        /* Styling for the container of scatter plots */
         div {
             display: flex;
             flex-wrap: wrap;
@@ -19,6 +21,7 @@
             justify-content: center;
         }
 
+        /* Container for the list */
         .list-container {
             flex: 1;
             display: flex;
@@ -31,12 +34,14 @@
             overflow-y: auto;
         }
 
+        /* Header styling */
         .list-container h3 {
             font-size: 18px;
             color: #444;
             margin-bottom: 10px;
         }
 
+        /* Styling for the list */
         #selected-list {
             padding: 10px;
             list-style-type: none;
@@ -80,50 +85,50 @@
 </div>
 
 <script>
-    d3.csv("./data/car_sample_data.csv").then(data => {
-        scatter_plot(
-            data = data,
-            ax = "#figure1",
-            title = "MPG vs Price",
-            xCol = "Price",
-            yCol = "MPG",
-            rCol = "Weight",
-            legend = [],
-            colorCol = "Country",
-            margin = 150
-        );
+    d3.csv("./data/car_sample_data.csv")
+        .then(data => {
+            scatter_plot(
+                data,
+                "#figure1",
+                "MPG vs Price",
+                "Price",
+                "MPG",
+                "Weight",
+                [],
+                "Country",
+                150
+            );
 
-        scatter_plot(
-            data = data,
-            ax = "#figure2",
-            title = "Weight vs Horsepower",
-            xCol = "Horsepower",
-            yCol = "Weight",
-            rCol = "Price",
-            legend = [],
-            colorCol = "Country",
-            margin = 150
-        );
+            scatter_plot(
+                data,
+                "#figure2",
+                "MPG vs Engine Size",
+                "EngineSizeCI",
+                "MPG",
+                "Weight",
+                [],
+                "Country",
+                150
+            );
 
-        document.addEventListener("mousemove", event => {
-            const listBox = d3.select(`#selected-list`);
-            const selectedPoints = Array.from(document.querySelectorAll(".selected"));
-            const ids = [...new Set(selectedPoints.map(d => +d.id.split(" ")[0].slice(3)))];
+            document.addEventListener("mousemove", event => {
+                const listBox = d3.select(`#selected-list`);
 
-            listBox.selectAll("li").remove();
-            if (ids.length > 0) {
-                listBox.selectAll(".listVals")
-                    .data(ids)
-                    .enter()
-                    .append("li")
-                    .attr("class", "listVals")
-                    .text(d => {
-                        const pointData = data[d];
-                        return `ID: ${d} (${pointData.Country}): Price - ${pointData.Price}, MPG - ${pointData.MPG}`;
-                    });
-            }
+                const selectedPoints = Array.from(document.querySelectorAll(".selected"));
+                const ids = [...new Set(selectedPoints.map(d => +d.id.split(" ")[0].slice(3)))];
+
+                listBox.selectAll("li").remove();
+                if (ids.length > 0) {
+                    listBox.selectAll(".listVals")
+                        .data(ids)
+                        .enter()
+                        .append("li")
+                        .attr("class", "listVals")
+                        .text(d => `Car ID: ${d}`)
+                        .exit();
+                }
+            });
         });
-    });
 </script>
 </body>
 </html>
