@@ -1,12 +1,4 @@
-function scatter_plot(data,
-                      ax,
-                      title = "",
-                      xCol = "",
-                      yCol = "",
-                      rCol = "",
-                      legend = [],
-                      colorCol = "",
-                      margin = 50) {
+function scatter_plot(data, ax, title = "", xCol = "", yCol = "", rCol = "", legend = [], colorCol = "", margin = 50) {
     const X = data.map(d => d[xCol]);
     const Y = data.map(d => d[yCol]);
     const R = data.map(d => d[rCol]);
@@ -29,11 +21,9 @@ function scatter_plot(data,
         .domain([yExtent[0] - yMargin, yExtent[1] + yMargin])
         .range([1000 - margin, margin]);
 
-    const rScale = d3.scaleSqrt()
-        .domain(d3.extent(R, d => +d))
-        .range([4, 12]);
-
+    const rScale = d3.scaleSqrt().domain(d3.extent(R, d => +d)).range([4, 12]);
     const Fig = d3.select(`${ax}`);
+
     Fig.selectAll('.markers')
         .data(data)
         .join('g')
@@ -47,13 +37,11 @@ function scatter_plot(data,
     const x_axis = d3.axisBottom(xScale).ticks(4);
     const y_axis = d3.axisLeft(yScale).ticks(4);
 
-    Fig.append("g")
-        .attr("class", "axis")
+    Fig.append("g").attr("class", "axis")
         .attr("transform", `translate(${0},${1000 - margin})`)
         .call(x_axis);
 
-    Fig.append("g")
-        .attr("class", "axis")
+    Fig.append("g").attr("class", "axis")
         .attr("transform", `translate(${margin},${0})`)
         .call(y_axis);
 
@@ -79,7 +67,8 @@ function scatter_plot(data,
         .attr("class", "title")
         .attr("fill", "black");
 
-    const brush = d3.brush()
+    const brush = d3
+        .brush()
         .on("start", brushStart)
         .on("brush end", brushed)
         .extent([
@@ -95,6 +84,7 @@ function scatter_plot(data,
 
     function brushed() {
         let selected_coordinates = d3.brushSelection(this);
+
         if (!selected_coordinates) return;
 
         const X1 = xScale.invert(selected_coordinates[0][0]);
@@ -103,18 +93,18 @@ function scatter_plot(data,
         const Y2 = yScale.invert(selected_coordinates[1][1]);
 
         d3.selectAll("circle").classed("selected", (d, i) => {
-            if (+d[xCol] >= X1 && +d[xCol] <= X2 && +d[yCol] <= Y1 && +d[yCol] >= Y2) {
-                return true;
-            }
-            return false;
+            return +d[xCol] >= X1 && +d[xCol] <= X2 && +d[yCol] <= Y1 && +d[yCol] >= Y2;
         });
     }
 
-    const legendContainer = Fig.append("g")
+    const legendContainer = Fig
+        .append("g")
         .attr("transform", `translate(${800},${margin})`)
         .attr("class", "marginContainer");
 
-    if (legend.length === 0) { legend = colorCategories; }
+    if (legend.length === 0) {
+        legend = colorCategories;
+    }
 
     const legends_items = legendContainer.selectAll("legends")
         .data(legend)
@@ -127,19 +117,11 @@ function scatter_plot(data,
         .attr("height", "40")
         .attr("class", d => d);
 
-    legends_items.append("text")
+    legends_items
+        .append("text")
         .text(d => d)
         .attr("dx", 45)
         .attr("dy", 25)
         .attr("class", "legend")
-        .attr("fill", "black")
-        .on("click", (event, d) => {
-            d3.selectAll("circle")
-                .classed("hidden", point => point[colorCol] !== d)
-                .filter(point => point[colorCol] === d)
-                .classed("hidden", false);
-        })
-        .on("dblclick", () => {
-            d3.selectAll("circle").classed("hidden", false);
-        });
+        .attr("fill", "black");
 }
